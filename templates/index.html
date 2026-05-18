@@ -4,22 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>betInformativo - Estatísticas para Apostas</title>
-    <!-- Vinculando o CSS externo que criamos na pasta static -->
+    <title>betInformativo - Home</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- Biblioteca de ícones para dar um visual mais moderno -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
 <body>
-
     <div class="container">
         <header>
             <h1>📊 betInformativo</h1>
-            <p>Análise de tendências e estatísticas dos últimos 5 jogos do Brasileirão</p>
-            <!-- Link rápido para ir ao painel administrativo -->
-            <a href="/admin" style="display: inline-block; margin-top: 15px; color: var(--accent-color); text-decoration: none; font-weight: bold; font-size: 0.9rem;">
-                <i class="fa-solid fa-gear"></i> Acessar Painel de Controle
+            <p>Estatísticas inteligentes para o Brasileirão</p>
+            <a href="/admin" style="color: var(--accent-color); text-decoration: none; font-size: 0.8rem; margin-top: 10px; display: inline-block;">
+                <i class="fa-solid fa-gear"></i> Painel Admin
             </a>
         </header>
 
@@ -27,25 +23,24 @@
             <table>
                 <thead>
                     <tr>
-                        <th class="posicao">Pos</th>
+                        <th>Pos</th>
                         <th>Time</th>
                         <th>Pts</th>
-                        <th>Forma (Últimos 5)</th>
+                        <th>Últimos 5</th>
                         <th>+1.5 Gols</th>
                         <th>Ambas Marcam</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- O Flask percorre os times calculados no banco de dados -->
                     {% for time in times %}
                     <tr>
                         <td class="posicao">{{ time.posicao }}º</td>
-                        <td class="nome-time">{{ time.nome }}</td>
-                        <td class="pontos">{{ time.pontos }}</td>
+                        <td class="nome-time"><strong>{{ time.nome }}</strong></td>
+                        <td>{{ time.pontos }}</td>
                         <td>
                             <div class="forma-container">
-                                {% for resultado in time.ultimos_5 %}
-                                <span class="forma {{ resultado }}">{{ resultado }}</span>
+                                {% for r in time.ultimos_5 %}
+                                <span class="forma {{ r }}">{{ r }}</span>
                                 {% endfor %}
                             </div>
                         </td>
@@ -56,9 +51,10 @@
                 </tbody>
             </table>
         </div>
+        <p style="text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 20px;">
+            Dica: Clique em um time para ver insights de apostas.
+        </p>
     </div>
-
-    <!-- Vinculando o JavaScript de interatividade antes do fechamento do corpo -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 

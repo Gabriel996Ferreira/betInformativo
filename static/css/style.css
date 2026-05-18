@@ -1,10 +1,9 @@
-/* Configurações Gerais de Cores e Fontes */
 :root {
   --bg-color: #0b0e11;
   --panel-bg: #151a22;
   --text-color: #ffffff;
   --text-muted: #8492a6;
-  --accent-color: #00ff87; /* Verde Neon clássico de BET */
+  --accent-color: #00ff87;
   --border-color: #222b36;
 }
 
@@ -13,15 +12,14 @@ body {
   background-color: var(--bg-color);
   color: var(--text-color);
   margin: 0;
-  padding: 40px 20px;
+  padding: 20px;
 }
 
 .container {
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
-/* Cabeçalho */
 header {
   text-align: center;
   margin-bottom: 30px;
@@ -29,109 +27,114 @@ header {
 
 header h1 {
   color: var(--accent-color);
-  font-size: 2.5rem;
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
   margin-bottom: 5px;
-  letter-spacing: 1px;
 }
 
-header p {
-  color: var(--text-muted);
-  font-size: 1rem;
-  margin: 0;
-}
-
-/* Estilização da Tabela Inteligente */
+/* Ajuste para Tabelas no Celular */
 .tabela-container {
   background-color: var(--panel-bg);
   border-radius: 8px;
-  overflow: hidden;
+  overflow-x: auto; /* Permite rolar pro lado no celular */
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   border: 1px solid var(--border-color);
+  -webkit-overflow-scrolling: touch;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  text-align: left;
+  min-width: 600px; /* Garante que a tabela não esmague os dados */
 }
 
 th,
 td {
-  padding: 16px 20px;
+  padding: 12px 15px;
   border-bottom: 1px solid var(--border-color);
+  font-size: 0.95rem;
 }
 
 th {
   background-color: #1a222d;
   color: var(--text-muted);
-  font-size: 0.85rem;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* Efeito de passar o mouse na linha do time */
-tbody tr {
-  transition: background-color 0.2s ease;
-  cursor: pointer;
+  font-size: 0.75rem;
 }
 
 tbody tr:hover {
   background-color: #1e2633;
 }
 
-tbody tr:last-child td {
-  border-bottom: none;
-}
-
-/* Posição e Nome do Time */
-.posicao {
-  font-weight: bold;
-  color: var(--text-muted);
-  width: 40px;
-}
-
-.nome-time {
-  font-weight: 600;
-  font-size: 1.05rem;
-}
-
-.pontos {
-  font-weight: bold;
-}
-
-/* Badge dos Últimos 5 Jogos (Forma) */
 .forma-container {
   display: flex;
-  gap: 6px;
+  gap: 4px;
 }
 
 .forma {
-  display: inline-block;
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: 4px;
   text-align: center;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: bold;
-  line-height: 24px;
+  line-height: 22px;
 }
 
 .V {
   background-color: #00b464;
-  color: #fff;
-} /* Vitória */
+}
 .E {
   background-color: #5b6b7c;
-  color: #fff;
-} /* Empate */
+}
 .D {
   background-color: #e53e3e;
-  color: #fff;
-} /* Derrota */
+}
 
-/* Destaque das Estatísticas de Opções de Aposta */
-.stat-value {
-  color: var(--accent-color);
+/* Grid Administrativa Responsiva */
+.painel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 20px;
+}
+
+@media (max-width: 850px) {
+  .painel-grid {
+    grid-template-columns: 1fr; /* Uma coluna no celular */
+  }
+}
+
+.card-admin {
+  background-color: var(--panel-bg);
+  border-radius: 8px;
+  padding: 20px;
+  border: 1px solid var(--border-color);
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  color: white;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.btn-salvar {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--accent-color);
+  border: none;
+  border-radius: 4px;
   font-weight: bold;
-  font-size: 1.05rem;
+  cursor: pointer;
 }
