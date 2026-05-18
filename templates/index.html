@@ -1,60 +1,101 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>betInformativo - Home</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>betInformativo - Estatísticas para Apostas</title>
+    <!-- CSS com cache-busting -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=1.4">
+    <!-- FontAwesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body class="dark-theme">
     <div class="container">
-        <header>
-            <h1>📊 betInformativo</h1>
-            <p>Estatísticas inteligentes para o Brasileirão</p>
-            <a href="/admin" style="color: var(--accent-color); text-decoration: none; font-size: 0.8rem; margin-top: 10px; display: inline-block;">
-                <i class="fa-solid fa-gear"></i> Painel Admin
-            </a>
+
+        <!-- Cabeçalho Principal -->
+        <header class="main-header">
+            <div class="header-left">
+                <div class="logo">
+                    <i class="fa-solid fa-chart-line icon-accent"></i>
+                    <h1>bet<span>Informativo</span></h1>
+                </div>
+                <p class="subtitle">Estatísticas dinâmicas e automáticas para analisar o mercado desportivo</p>
+            </div>
+            <div class="header-right">
+                <a href="{{ url_for('admin') }}" class="btn btn-outline">
+                    <i class="fa-solid fa-lock"></i> Painel Admin
+                </a>
+            </div>
         </header>
 
-        <div class="tabela-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Pos</th>
-                        <th>Time</th>
-                        <th>Pts</th>
-                        <th>Últimos 5</th>
-                        <th>+1.5 Gols</th>
-                        <th>Ambas Marcam</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for time in times %}
-                    <tr>
-                        <td class="posicao">{{ time.posicao }}º</td>
-                        <td class="nome-time"><strong>{{ time.nome }}</strong></td>
-                        <td>{{ time.pontos }}</td>
-                        <td>
-                            <div class="forma-container">
-                                {% for r in time.ultimos_5 %}
-                                <span class="forma {{ r }}">{{ r }}</span>
-                                {% endfor %}
-                            </div>
-                        </td>
-                        <td class="stat-value">{{ time.estatisticas.mais_1_5_gols }}</td>
-                        <td class="stat-value">{{ time.estatisticas.ambas_marcam }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <!-- Caixa de Alerta de Análise com JS -->
+        <div id="tip-box" class="tip-box hidden">
+            <div class="tip-content">
+                <i class="fa-solid fa-circle-info tip-icon"></i>
+                <div class="tip-text-container">
+                    <h4 id="tip-title">Análise do Confronto</h4>
+                    <p id="tip-message">Clique em qualquer linha de equipa para carregar o conselho de aposta.</p>
+                </div>
+            </div>
         </div>
-        <p style="text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 20px;">
-            Dica: Clique em um time para ver insights de apostas.
-        </p>
+
+        <!-- Tabela Responsiva de Classificação -->
+        <main class="card table-card">
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Pos</th>
+                            <th>Equipa</th>
+                            <th>Pts</th>
+                            <th>Últimos 5 Jogos</th>
+                            <th>+1.5 Gols</th>
+                            <th>Ambas Marcam</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for time in times %}
+                        <tr class="clickable-row" data-name="{{ time.nome }}" data-over="{{ time.estatisticas.mais_1_5_gols }}" data-btts="{{ time.estatisticas.ambas_marcam }}">
+
+                            <td class="bold">{{ time.posicao }}</td>
+                            <td class="bold text-accent">{{ time.nome }}</td>
+                            <td class="bold">{{ time.pontos }}</td>
+                            <td>
+                                <div class="badge-container">
+                                    {% for resultado in time.ultimos_5 %}
+                                    <span class="badge badge-{{ resultado | lower }}">{{ resultado }}</span>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <td class="bold text-green">{{ time.estatisticas.mais_1_5_gols }}</td>
+                            <td class="bold text-blue">{{ time.estatisticas.ambas_marcam }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="empty-state">Sem dados registados. Aceda ao Painel Admin para preencher os dados.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <footer class="main-footer">
+            {% if ultima_sinc %}
+            <p style="color: var(--color-green); font-size: 0.85rem; margin-bottom: 10px;">
+                <i class="fa-solid fa-rotate"></i> Dados atualizados automaticamente em: <strong>{{ ultima_sinc }} UTC</strong>
+            </p>
+            {% endif %}
+            <p>&copy; 2026 betInformativo. Desenvolvido com Python, Flask e SQLite.</p>
+        </footer>
+
     </div>
+
+    <!-- Script de Comportamento Dinâmico -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 
