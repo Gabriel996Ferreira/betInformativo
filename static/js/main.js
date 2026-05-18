@@ -17,13 +17,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // Construção personalizada do conselho de aposta em tempo real
             let advice = "";
             if (over15 >= 70 && btts >= 60) {
-                advice = `Excelente cenário para golos! O ${name} apresenta ${over15}% de frequência para +1.5 Golos e ${btts}% em Ambas Marcam. Sugere-se uma entrada combinada de over + btts.`;
+                advice = `Excelente cenário para gols! O ${name} apresenta ${over15}% de frequência para +1.5 Gols e ${btts}% em Ambas Marcam. Sugere-se uma entrada combinada de over + btts.`;
             } else if (over15 >= 70) {
-                advice = `Análise forte para mercado de golos. O ${name} mantém uma consistência de ${over15}% de partidas com mais de 1.5 golos. Excelente para acumuladores de golos.`;
+                advice = `Análise forte para mercado de gols. O ${name} mantém uma consistência de ${over15}% de partidas com mais de 1.5 gols. Excelente para acumuladores de gols.`;
             } else if (btts >= 60) {
-                advice = `Mercado de Ambas Marcam está atrativo. Com ${btts}% de ocorrência nos jogos do ${name}, a expectativa é de golos de ambos os lados neste confronto.`;
+                advice = `Mercado de Ambas Marcam está atrativo. Com ${btts}% de ocorrência nos jogos do ${name}, a expectativa é de gols de ambos os lados neste confronto.`;
             } else {
-                advice = `Tendência de jogo equilibrado e fechado. O ${name} apresenta médias modestas de golos (${over15}% para +1.5). Uma aposta em golos tem risco elevado.`;
+                advice = `Tendência de jogo equilibrado e fechado. O ${name} apresenta médias modestas de gols (${over15}% para +1.5). Uma aposta em gols tem risco elevado.`;
             }
 
             // Atualização visual do painel de recomendação desportiva
