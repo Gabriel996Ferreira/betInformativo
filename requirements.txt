@@ -1,3 +1,6 @@
+STREAMING_CHUNK:Configuring system dependencies...
+
 Flask
 Flask-SQLAlchemy
 gunicorn
+requests
