@@ -1,40 +1,38 @@
-// Aguarda todo o HTML da página carregar antes de rodar o script
+/**
+ * Script de controlo para análise dinâmica do betInformativo
+ */
 document.addEventListener('DOMContentLoaded', () => {
-    
-    // Seleciona todas as linhas (tr) que estão dentro do corpo da tabela (tbody)
-    const linhasTimes = document.querySelectorAll('tbody tr');
+    const rows = document.querySelectorAll('.clickable-row');
+    const tipBox = document.getElementById('tip-box');
+    const tipTitle = document.getElementById('tip-title');
+    const tipMessage = document.getElementById('tip-message');
 
-    // Para cada linha de time encontrada, adicionamos um evento de clique
-    linhasTimes.forEach(linha => {
-        linha.addEventListener('click', () => {
-            
-            // Pega o nome do time e as estatísticas direto do texto das células da tabela
-            const nomeTime = linha.querySelector('.nome-time').innerText;
-            const maisGols = linha.querySelectorAll('.stat-value')[0].innerText;
-            const ambasMarcam = linha.querySelectorAll('.stat-value')[1].innerText;
+    rows.forEach(row => {
+        row.addEventListener('click', () => {
+            // Extração de dados da linha clicada
+            const name = row.getAttribute('data-name');
+            const over15 = parseFloat(row.getAttribute('data-over'));
+            const btts = parseFloat(row.getAttribute('data-btts'));
 
-            // Criando uma lógica simples de palpite baseada nos números
-            let palpiteSugerido = "";
-            
-            // Converte a porcentagem (ex: "80%") em número inteiro (80) para fazer a lógica
-            const porcentagemGols = parseInt(maisGols);
-
-            if (porcentagemGols >= 80) {
-                palpiteSugerido = `🔥 Forte tendência para o mercado de 'Mais de 1.5 Gols' (${maisGols} dos jogos).`;
+            // Construção personalizada do conselho de aposta em tempo real
+            let advice = "";
+            if (over15 >= 70 && btts >= 60) {
+                advice = `Excelente cenário para golos! O ${name} apresenta ${over15}% de frequência para +1.5 Golos e ${btts}% em Ambas Marcam. Sugere-se uma entrada combinada de over + btts.`;
+            } else if (over15 >= 70) {
+                advice = `Análise forte para mercado de golos. O ${name} mantém uma consistência de ${over15}% de partidas com mais de 1.5 golos. Excelente para acumuladores de golos.`;
+            } else if (btts >= 60) {
+                advice = `Mercado de Ambas Marcam está atrativo. Com ${btts}% de ocorrência nos jogos do ${name}, a expectativa é de golos de ambos os lados neste confronto.`;
             } else {
-                palpiteSugerido = `⚖️ Jogo equilibrado. Ambas Marcam está em ${ambasMarcam}.`;
+                advice = `Tendência de jogo equilibrado e fechado. O ${name} apresenta médias modestas de golos (${over15}% para +1.5). Uma aposta em golos tem risco elevado.`;
             }
 
-            // Exibe um alerta personalizado na tela
-            alert(`
-📊 INSIGHT DE APOSTA: ${nomeTime.toUpperCase()}
---------------------------------------------------
-• Mais de 1.5 Gols: ${maisGols}
-• Ambas Marcam: ${ambasMarcam}
-
-💡 Palpite do betInformativo:
-${palpiteSugerido}
-            `);
+            // Atualização visual do painel de recomendação desportiva
+            tipTitle.innerHTML = `<i class="fa-solid fa-calculator"></i> Análise de Aposta: <strong>${name}</strong>`;
+            tipMessage.textContent = advice;
+            
+            // Exibição do painel oculto com efeito suave
+            tipBox.classList.remove('hidden');
+            tipBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         });
     });
 });

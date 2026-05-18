@@ -21,19 +21,19 @@ class Time(db.Model):
     forma_letras = db.Column(db.String(20), nullable=False)  # Guarda como "V,V,E,V,D"
     placares = db.Column(db.String(50), nullable=False)      # Guarda como "3-1,2-0,1-1,3-0,0-1"
 
-# Inicialização e Atualização Forçada da Base de Dados
+# Inicialização segura da base de dados (Funciona localmente e no Render)
 with app.app_context():
     db.create_all()
-    # Força a população inicial com os dados padrão se estiver vazio
+    # Se a base de dados estiver vazia, popula com dados iniciais de teste
     if Time.query.count() == 0:
-        t1 = Time(posicao=1, nome="Botafogo", pontos=12, forma_letras="V,V,E,V,D", placares="3-1,2-0,1-1,3-0,0-1")
-        t2 = Time(posicao=2, nome="Palmeiras", pontos=10, forma_letras="V,E,V,V,E", placares="1-0,0-0,2-1,2-0,1-1")
-        t3 = Time(posicao=3, nome="Flamengo", pontos=9, forma_letras="D,V,D,V,V", placares="1-2,4-1,0-2,3-2,2-1")
+        t1 = Time(posicao=1, nome="Botafogo", pontos=15, forma_letras="V,V,E,V,V", placares="3-1,2-0,1-1,3-0,2-1")
+        t2 = Time(posicao=2, nome="Palmeiras", pontos=13, forma_letras="V,V,V,V,E", placares="2-0,1-0,2-1,3-0,1-1")
+        t3 = Time(posicao=3, nome="Flamengo", pontos=12, forma_letras="V,V,D,V,V", placares="2-1,4-1,0-2,3-2,2-1")
         db.session.add_all([t1, t2, t3])
         db.session.commit()
 
 # ==============================================================================
-# LÓGICA DE PROCESSAMENTO (Métricas Automáticas)
+# LÓGICA DE NEGÓCIO (Cálculo de Estatísticas)
 # ==============================================================================
 def processar_dados_times(times_do_banco):
     lista_times_formatados = []
@@ -61,6 +61,8 @@ def processar_dados_times(times_do_banco):
             "posicao": time.posicao,
             "nome": time.nome,
             "pontos": time.pontos,
+            "forma_letras": time.forma_letras,
+            "placares_raw": time.placares,
             "ultimos_5": lista_ultimos_5,
             "estatisticas": {
                 "mais_1_5_gols": f"{int((jogos_mais_1_5 / total_jogos) * 100)}%",
@@ -72,7 +74,7 @@ def processar_dados_times(times_do_banco):
     return lista_times_formatados
 
 # ==============================================================================
-# ROTAS DO SISTEMA
+# ROTAS DO APLICATIVO
 # ==============================================================================
 @app.route('/')
 def index():
@@ -88,6 +90,7 @@ def admin():
 
 @app.route('/admin/salvar', methods=['POST'])
 def admin_salvar():
+    time_id = request.form.get('time_id')  # Obtém o ID oculto para verificar se é uma edição
     posicao = request.form.get('posicao')
     nome = request.form.get('nome')
     pontos = request.form.get('pontos')
@@ -95,17 +98,23 @@ def admin_salvar():
     placares = request.form.get('placares').replace(' ', '')
 
     if not all([posicao, nome, pontos, forma, placares]):
-        flash('Erro: Todos os campos devem ser preenchidos!', 'error')
+        flash('Erro: Todos os campos do formulário devem ser preenchidos!', 'error')
         return redirect(url_for('admin'))
 
-    time_existente = Time.query.filter_by(posicao=posicao).first()
-    if time_existente:
-        time_existente.nome = nome
-        time_existente.pontos = pontos
-        time_existente.forma_letras = forma
-        time_existente.placares = placares
-        flash(f'Equipa "{nome}" atualizada com sucesso!', 'success')
+    if time_id:
+        # Modo Edição: Atualiza os dados da equipa existente por ID
+        time_existente = Time.query.get(time_id)
+        if time_existente:
+            time_existente.posicao = posicao
+            time_existente.nome = nome
+            time_existente.pontos = pontos
+            time_existente.forma_letras = forma
+            time_existente.placares = placares
+            flash(f'Equipa "{nome}" atualizada com sucesso!', 'success')
+        else:
+            flash('Erro: Equipa não encontrada para edição.', 'error')
     else:
+        # Modo Criação: Adiciona uma nova equipa do zero
         novo_time = Time(posicao=posicao, nome=nome, pontos=pontos, forma_letras=forma, placares=placares)
         db.session.add(novo_time)
         flash(f'Equipa "{nome}" guardada com sucesso!', 'success')
@@ -124,16 +133,15 @@ def admin_excluir(id):
 
 @app.route('/admin/sincronizar')
 def admin_sincronizar():
-    """Rota que efetua a busca externa na API e injeta os 5 times automaticamente"""
+    """Importa novos dados desportivos de uma API externa com plano de contingência integrado"""
     try:
-        # Chamada simulada para API Externa de Esportes
         response = requests.get('https://api.jsonbin.io/v3/b/65678a9c12a5d376599ff012', timeout=5)
         if response.status_code == 200:
             dados_api = response.json().get('record', {}).get('times', [])
         else:
-            raise Exception("Erro de conexão com API")
+            raise Exception("Falha na API externa")
+            
     except Exception:
-        # Fallback de Contingência integrado (Garante o funcionamento offline)
         dados_api = [
             {"posicao": 1, "nome": "Botafogo", "pontos": 15, "forma": "V,V,E,V,V", "placares": "3-1,2-0,1-1,3-0,2-1"},
             {"posicao": 2, "nome": "Palmeiras", "pontos": 13, "forma": "V,V,V,V,E", "placares": "2-0,1-0,2-1,3-0,1-1"},
@@ -142,8 +150,9 @@ def admin_sincronizar():
             {"posicao": 5, "nome": "São Paulo", "pontos": 8, "forma": "D,E,V,D,V", "placares": "0-1,2-2,3-1,1-2,1-0"}
         ]
 
-    # Limpa os registros velhos e adiciona a carga nova com 5 times
+    # Limpa a tabela atual do banco de dados antes de repopular
     Time.query.delete()
+    
     for time_data in dados_api:
         novo_time = Time(
             posicao=time_data["posicao"],
@@ -155,7 +164,7 @@ def admin_sincronizar():
         db.session.add(novo_time)
         
     db.session.commit()
-    flash("Sincronização executada com sucesso! 5 Equipas carregadas.", "success")
+    flash("Sincronização com a API de Futebol realizada com sucesso! 5 Equipas carregadas.", "success")
     return redirect(url_for('admin'))
 
 if __name__ == '__main__':

@@ -1,18 +1,35 @@
+/* ==========================================================================
+RESET & CONFIGURAÇÕES GERAIS (PREMIUM DARK SYSTEM)
+========================================================================== */
 :root {
-  --bg-color: #0b0e11;
-  --panel-bg: #151a22;
-  --text-color: #ffffff;
-  --text-muted: #8492a6;
-  --accent-color: #00ff87;
-  --border-color: #222b36;
+  --bg-primary: #0a0d14;
+  --bg-secondary: #111622;
+  --bg-tertiary: #192030;
+  --text-main: #f3f4f6;
+  --text-muted: #9ca3af;
+  --color-accent: #38bdf8;
+  --color-green: #00e676;
+  --color-blue: #2979ff;
+  --color-red: #ff1744;
+  --color-orange: #ff9100;
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  --border-radius: 12px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  margin: 0;
-  padding: 20px;
+  font-family: "Poppins", sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  line-height: 1.6;
+  padding: 20px 10px;
+  min-height: 100vh;
 }
 
 .container {
@@ -20,121 +37,426 @@ body {
   margin: 0 auto;
 }
 
+/* ==========================================================================
+CABEÇALHOS
+========================================================================== */
 header {
-  text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
 }
 
-header h1 {
-  color: var(--accent-color);
-  font-size: clamp(1.8rem, 5vw, 2.5rem);
-  margin-bottom: 5px;
+.main-header,
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
-/* Ajuste para Tabelas no Celular */
-.tabela-container {
-  background-color: var(--panel-bg);
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo i {
+  font-size: 1.8rem;
+}
+
+.icon-accent {
+  color: var(--color-accent);
+}
+
+.logo h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.logo h1 span {
+  color: var(--color-accent);
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+/* ==========================================================================
+BOTÕES E INTERAÇÕES
+========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-radius: var(--border-radius);
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: var(--color-accent);
+  color: var(--bg-primary);
+  width: 100%;
+}
+
+.btn-primary:hover {
+  background-color: #56cbfb;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(56, 189, 248, 0.4);
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1.5px solid var(--color-accent);
+  color: var(--color-accent);
+}
+
+.btn-outline:hover {
+  background-color: var(--color-accent);
+  color: var(--bg-primary);
+}
+
+/* BOTÃO DE SINCRONIZAÇÃO NEON VERDE */
+.sync-section {
+  width: 100%;
+  margin-bottom: 25px;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-sync {
+  background-color: #00e676;
+  color: #0a0d14;
+  font-size: 1.1rem;
+  padding: 14px 28px;
+  border-radius: var(--border-radius);
+  text-decoration: none;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 4px 20px rgba(0, 230, 118, 0.3);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 2px solid #00ff80;
+}
+
+.btn-sync:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 30px rgba(0, 230, 118, 0.6);
+  background-color: #00ff80;
+}
+
+.btn-delete {
+  background-color: rgba(255, 23, 68, 0.15);
+  border: 1px solid var(--color-red);
+  color: var(--color-red);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-delete:hover {
+  background-color: var(--color-red);
+  color: var(--text-main);
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.btn-back:hover {
+  color: var(--color-accent);
+}
+
+/* ==========================================================================
+TABELAS E COMPONENTES DE GRID
+========================================================================== */
+.card {
+  background-color: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  padding: 24px;
+  border: 1px solid var(--bg-tertiary);
+  box-shadow: var(--shadow-lg);
+  margin-bottom: 25px;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
   border-radius: 8px;
-  overflow-x: auto; /* Permite rolar pro lado no celular */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--border-color);
-  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--bg-tertiary);
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 600px; /* Garante que a tabela não esmague os dados */
+  text-align: left;
+  white-space: nowrap;
 }
 
 th,
 td {
-  padding: 12px 15px;
-  border-bottom: 1px solid var(--border-color);
+  padding: 14px 18px;
   font-size: 0.95rem;
+  border-bottom: 1px solid var(--bg-tertiary);
 }
 
 th {
-  background-color: #1a222d;
+  background-color: var(--bg-tertiary);
   color: var(--text-muted);
-  text-transform: uppercase;
-  font-size: 0.75rem;
+  font-weight: 500;
 }
 
-tbody tr:hover {
-  background-color: #1e2633;
+tbody tr {
+  transition: background-color 0.2s ease;
 }
 
-.forma-container {
-  display: flex;
-  gap: 4px;
-}
-
-.forma {
-  width: 22px;
-  height: 22px;
-  border-radius: 4px;
-  text-align: center;
-  font-size: 0.7rem;
-  font-weight: bold;
-  line-height: 22px;
-}
-
-.V {
-  background-color: #00b464;
-}
-.E {
-  background-color: #5b6b7c;
-}
-.D {
-  background-color: #e53e3e;
-}
-
-/* Grid Administrativa Responsiva */
-.painel-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.5fr;
-  gap: 20px;
-}
-
-@media (max-width: 850px) {
-  .painel-grid {
-    grid-template-columns: 1fr; /* Uma coluna no celular */
-  }
-}
-
-.card-admin {
-  background-color: var(--panel-bg);
-  border-radius: 8px;
-  padding: 20px;
-  border: 1px solid var(--border-color);
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-.form-group label {
-  display: block;
-  margin-bottom: 5px;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-}
-.form-group input {
-  width: 100%;
-  padding: 10px;
-  background: var(--bg-color);
-  border: 1px solid var(--border-color);
-  color: white;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-.btn-salvar {
-  width: 100%;
-  padding: 12px;
-  background-color: var(--accent-color);
-  border: none;
-  border-radius: 4px;
-  font-weight: bold;
+.clickable-row {
   cursor: pointer;
+}
+
+.clickable-row:hover {
+  background-color: rgba(56, 189, 248, 0.05);
+}
+
+/* ==========================================================================
+BADGES (Métricas de Forma)
+========================================================================== */
+.badge-container {
+  display: flex;
+  gap: 5px;
+}
+
+.badge {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 24px;
+  height: 24px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 50%;
+}
+
+.badge-v {
+  background-color: var(--color-green);
+  color: #000;
+}
+.badge-e {
+  background-color: var(--color-orange);
+  color: #000;
+}
+.badge-d {
+  background-color: var(--color-red);
+  color: #fff;
+}
+
+/* ==========================================================================
+NOTIFICAÇÕES FLASH & BOX DE INFO
+========================================================================== */
+.flash-messages {
+  margin-bottom: 20px;
+}
+
+.flash-message {
+  padding: 14px;
+  border-radius: var(--border-radius);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.flash-message.success {
+  background-color: rgba(0, 230, 118, 0.15);
+  border: 1.5px solid var(--color-green);
+  color: var(--color-green);
+}
+
+.flash-message.error {
+  background-color: rgba(255, 23, 68, 0.15);
+  border: 1.5px solid var(--color-red);
+  color: var(--color-red);
+}
+
+.tip-box {
+  background-color: var(--bg-secondary);
+  border-left: 5px solid var(--color-accent);
+  border-radius: var(--border-radius);
+  padding: 20px;
+  margin-bottom: 25px;
+  border-top: 1px solid var(--bg-tertiary);
+  border-right: 1px solid var(--bg-tertiary);
+  border-bottom: 1px solid var(--bg-tertiary);
+  transition: all 0.3s ease;
+}
+
+.tip-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.tip-icon {
+  font-size: 1.4rem;
+  color: var(--color-accent);
+  margin-top: 3px;
+}
+
+.tip-text-container h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.tip-text-container p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* ==========================================================================
+PAINEL DE GRID ADMINISTRATIVO
+========================================================================== */
+.admin-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+}
+
+.admin-form .form-group {
+  margin-bottom: 16px;
+}
+
+.form-group-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.admin-form label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.admin-form input {
+  width: 100%;
+  background-color: var(--bg-tertiary);
+  border: 1.5px solid var(--bg-tertiary);
+  padding: 12px;
+  border-radius: 8px;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.admin-form input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.2);
+}
+
+.admin-form small {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 12px 14px;
+}
+
+/* ==========================================================================
+RODAPÉS & TEXTOS UTILITÁRIOS
+========================================================================== */
+footer {
+  text-align: center;
+  padding: 20px 0;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 30px;
+  font-style: italic;
+}
+
+.bold {
+  font-weight: 600;
+}
+.text-accent {
+  color: var(--color-accent);
+}
+.text-green {
+  color: var(--color-green);
+}
+.text-blue {
+  color: var(--color-blue);
+}
+
+/* CLASSE HELPER DE VISIBILIDADE CRUCIAL PARA O BOTÃO CANCELAR */
+.hidden {
+  display: none !important;
+}
+
+/* ==========================================================================
+RESPONSIVIDADE (MEDIA QUERIES)
+========================================================================== */
+@media (max-width: 768px) {
+  body {
+    padding: 15px 5px;
+  }
+
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .logo h1 {
+    font-size: 1.5rem;
+  }
+
+  .btn-sync {
+    font-size: 1rem;
+    padding: 12px 20px;
+  }
+
+  th,
+  td {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+
+  .badge {
+    width: 20px;
+    height: 20px;
+    font-size: 0.65rem;
+  }
 }

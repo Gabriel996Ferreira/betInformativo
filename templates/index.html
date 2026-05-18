@@ -4,84 +4,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>betInformativo - Estatísticas para Apostas</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=1.4">
+    <title>Painel Admin - betInformativo</title>
+    <!-- CSS com cache-busting -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=1.6">
+    <!-- FontAwesome para ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body class="dark-theme">
-    <div class="container">
+    <div class="container admin-container">
 
-        <header class="main-header">
-            <div class="header-left">
-                <div class="logo">
-                    <i class="fa-solid fa-chart-line icon-accent"></i>
-                    <h1>bet<span>Informativo</span></h1>
-                </div>
-                <p class="subtitle">Estatísticas automáticas para analisar o mercado desportivo</p>
+        <!-- Cabeçalho Admin -->
+        <header class="admin-header">
+            <div class="logo">
+                <i class="fa-solid fa-gears icon-accent"></i>
+                <h1>Painel <span>Administrativo</span></h1>
             </div>
-            <div class="header-right">
-                <a href="{{ url_for('admin') }}" class="btn btn-outline">
-                    <i class="fa-solid fa-lock"></i> Painel Admin
-                </a>
-            </div>
+            <p class="subtitle">Registe equipas, edite resultados ou sincronize manualmente com dados da nuvem</p>
         </header>
 
-        <div id="tip-box" class="tip-box hidden">
-            <div class="tip-content">
-                <i class="fa-solid fa-circle-info tip-icon"></i>
-                <div class="tip-text-container">
-                    <h4 id="tip-title">Análise do Confronto</h4>
-                    <p id="tip-message">Clique numa linha para ver o conselho.</p>
-                </div>
-            </div>
+        <!-- Sincronização Dinâmica Manual (Botão Verde Neon) -->
+        <div class="sync-section">
+            <a href="{{ url_for('admin_sincronizar') }}" class="btn btn-sync">
+                <i class="fa-solid fa-cloud-arrow-down"></i> Sincronizar com API de Futebol (Manual)
+            </a>
         </div>
 
-        <main class="card table-card">
-            <div class="table-container">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Pos</th>
-                            <th>Equipa</th>
-                            <th>Pts</th>
-                            <th>Últimos 5 Jogos</th>
-                            <th>+1.5 Gols</th>
-                            <th>Ambas Marcam</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for time in times %}
-                        <tr class="clickable-row" data-name="{{ time.nome }}" data-over="{{ time.estatisticas.mais_1_5_gols }}" data-btts="{{ time.estatisticas.ambas_marcam }}">
-                            <td class="bold">{{ time.posicao }}</td>
-                            <td class="bold text-accent">{{ time.nome }}</td>
-                            <td class="bold">{{ time.pontos }}</td>
-                            <td>
-                                <div class="badge-container">
-                                    {% for resultado in time.ultimos_5 %}
-                                    <span class="badge badge-{{ resultado | lower }}">{{ resultado }}</span>
-                                    {% endfor %}
-                                </div>
-                            </td>
-                            <td class="bold text-green">{{ time.estatisticas.mais_1_5_gols }}</td>
-                            <td class="bold text-blue">{{ time.estatisticas.ambas_marcam }}</td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="6" class="empty-state">Sem dados. Aceda ao Painel Admin para sincronizar.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        <!-- Alertas Flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="flash-message {{ category }}">
+                <i class="fa-solid {% if category == 'success' %}fa-circle-check{% else %}fa-triangle-exclamation{% endif %}"></i>
+                <span>{{ message }}</span>
             </div>
-        </main>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
 
-        <footer class="main-footer">
-            <p>&copy; 2026 betInformativo. Desenvolvido com Python, Flask e SQLite.</p>
+        <!-- Grid Administrativo CRUD -->
+        <div class="admin-grid">
+
+            <!-- Coluna Esquerda: Formulário de Cadastro e Edição -->
+            <section class="card form-card">
+                <h2 id="form-title"><i class="fa-solid fa-pen-to-square"></i> Guardar Nova Equipa</h2>
+                <form action="{{ url_for('admin_salvar') }}" method="POST" class="admin-form">
+
+                    <!-- ID Oculto para controlo do modo Edição -->
+                    <input type="hidden" id="time_id" name="time_id" value="">
+
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label for="posicao">Posição na Tabela</label>
+                            <input type="number" id="posicao" name="posicao" placeholder="Ex: 1" required min="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="pontos">Pontuação Total</label>
+                            <input type="number" id="pontos" name="pontos" placeholder="Ex: 12" required min="0">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nome">Nome da Equipa</label>
+                        <input type="text" id="nome" name="nome" placeholder="Ex: Botafogo" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="forma">Últimos 5 Jogos (V, E, D)</label>
+                        <input type="text" id="forma" name="forma" placeholder="Ex: V,V,E,V,D" required pattern="^[V,E,D,v,e,d, ,]+$">
+                        <small>Utilize apenas as letras V (Vitória), E (Empate) e D (Derrota).</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="placares">Resultados dos Últimos 5 Jogos (Separados por vírgula)</label>
+                        <input type="text" id="placares" name="placares" placeholder="Ex: 3-1,2-0,1-1,3-0,0-1" required>
+                        <small>Placares reais (Golos Marcados - Golos Sofridos).</small>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button type="submit" id="btn-submit" class="btn btn-primary" style="flex: 2;">
+                            <i class="fa-solid fa-circle-plus"></i> Guardar Informações
+                        </button>
+                        <button type="button" id="btn-cancelar" class="btn btn-outline hidden" style="flex: 1; border-color: var(--color-red); color: var(--color-red);" onclick="resetarFormulario()">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Coluna Direita: Equipas Armazenadas (Tabela CRUD) -->
+            <section class="card list-card">
+                <h2><i class="fa-solid fa-database"></i> Equipas Armazenadas</h2>
+                <div class="table-container shadow-sm">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Pos</th>
+                                <th>Equipa</th>
+                                <th>Pts</th>
+                                <th style="text-align: center;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for time in times %}
+                            <tr>
+                                <td class="bold">{{ time.posicao }}</td>
+                                <td class="bold text-accent">{{ time.nome }}</td>
+                                <td>{{ time.pontos }}</td>
+                                <td style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+                                    <!-- Botão de Editar Dinâmico -->
+                                    <button type="button" class="btn" style="background-color: #2563eb; color: white; padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; cursor: pointer; border: none;" onclick="preencherParaEdicao('{{ time.id }}', '{{ time.posicao }}', '{{ time.nome }}', '{{ time.pontos }}', '{{ time.forma_letras }}', '{{ time.placares_raw }}')">
+                                        <i class="fa-solid fa-user-pen"></i> Editar
+                                    </button>
+
+                                    <!-- Formulário Seguro POST para Eliminar -->
+                                    <form action="{{ url_for('admin_excluir', id=time.id) }}" method="POST" style="display: inline; margin: 0;">
+                                        <button type="submit" class="btn-delete" style="padding: 6px 12px; font-size: 0.8rem;">
+                                            <i class="fa-solid fa-trash"></i> Eliminar
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="empty-state">Nenhuma equipa registada. Clique em Sincronizar Manualmente!</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+
+        <footer class="admin-footer">
+            <a href="{{ url_for('index') }}" class="btn-back">
+                <i class="fa-solid fa-circle-arrow-left"></i> Voltar para a Tabela Pública
+            </a>
         </footer>
+
     </div>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    <!-- Script JavaScript para Controlar a Edição Dinâmica sem Recarregar -->
+    <script>
+        function preencherParaEdicao(id, posicao, nome, pontos, forma, placares) {
+            // Atribui os valores aos campos do formulário
+            document.getElementById('time_id').value = id;
+            document.getElementById('posicao').value = posicao;
+            document.getElementById('nome').value = nome;
+            document.getElementById('pontos').value = pontos;
+            document.getElementById('forma').value = forma;
+            document.getElementById('placares').value = placares;
+
+            // Altera visualmente o Cabeçalho e o Botão do Formulário
+            document.getElementById('form-title').innerHTML = '<i class="fa-solid fa-user-pen" style="color: #2563eb;"></i> Editar Equipa: ' + nome;
+
+            const btnSubmit = document.getElementById('btn-submit');
+            btnSubmit.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Atualizar Informações';
+            btnSubmit.style.backgroundColor = '#2563eb';
+
+            // Exibe o botão de cancelar edição
+            document.getElementById('btn-cancelar').classList.remove('hidden');
+
+            // Foca na posição
+            document.getElementById('posicao').focus();
+        }
+
+        function resetarFormulario() {
+            // Limpa todos os inputs
+            document.getElementById('time_id').value = '';
+            document.getElementById('posicao').value = '';
+            document.getElementById('nome').value = '';
+            document.getElementById('pontos').value = '';
+            document.getElementById('forma').value = '';
+            document.getElementById('placares').value = '';
+
+            // Restaura o visual padrão do formulário de criação
+            document.getElementById('form-title').innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Guardar Nova Equipa';
+
+            const btnSubmit = document.getElementById('btn-submit');
+            btnSubmit.innerHTML = '<i class="fa-solid fa-circle-plus"></i> Guardar Informações';
+            btnSubmit.style.backgroundColor = '';
+
+            // Oculta o botão Cancelar
+            document.getElementById('btn-cancelar').classList.add('hidden');
+        }
+    </script>
 </body>
 
 </html>
